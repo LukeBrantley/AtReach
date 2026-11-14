@@ -1,113 +1,44 @@
-# AtReach
+# AtReach local prototype
 
-AtReach helps the THN ACO identify and resolve payer-attribution mismatches: patients listed under the ACO's risk who receive care outside its provider network. By giving the attribution team a focused work queue and the context needed for outreach, the initiative aims to improve care continuity, quality performance, and value-based contract outcomes.
+AtReach is a small local web app for reviewing payer attribution and ACO utilization mismatches, recording manual outreach, and viewing workflow progress. It is a prototype for synthetic data and does not connect to payer, claims, EHR, Azure, or Databricks services.
 
-## The problem
+## Run locally
 
-Payer attribution and the provider actually delivering a patient's care can differ, particularly in managed Medicaid plans that automatically assign a PCP when the patient has not selected one. The ACO may therefore be financially accountable for patients whose care, utilization, and care gaps it cannot influence.
+Requires Python 3.10 or newer. The app uses only the Python standard library.
 
-This mismatch also means health centers may not receive appropriate credit for care-gap closure and may miss key information about transitions of care, care management, utilization management, and shared savings.
+```powershell
+python server.py
+```
 
-AtReach focuses on patients who are using care outside the ACO—not patients who are entirely lost to care. Patients with zero claims utilization are out of scope.
+Then open [http://127.0.0.1:8000](http://127.0.0.1:8000). The server listens on this computer only. Stop it with `Ctrl+C`.
 
-## Goals
+## What the prototype includes
 
-- Reduce per-member-per-month (PMPM) costs.
-- Improve quality STAR performance.
-- Align payer attribution with where patients receive primary care.
-- Create a repeatable, compliant process for attribution outreach and resolution.
+- A review queue of synthetic patients with a mismatch between payer-attributed provider and claims utilization provider.
+- Exclusion of patients with zero claims utilization.
+- Search and filters for patient, MRN, payer, and work status.
+- A patient workspace with attribution, utilization, and fictional contact details.
+- Manual outreach logging with date, channel, outcome, verbal provider confirmation, and an operational note.
+- SQLite storage for the synthetic patient roster and saved outreach history.
+- Basic funnel and outreach reporting.
 
-## Process funnel
+The sample roster is generated locally on first run and saved in `.atreach/prototype.sqlite3`. Outreach activity remains in that local database across restarts. Delete that database to reset the sample data and activity.
 
-1. **Identified** — attribution and utilization data indicate an eligible mismatch.
-2. **Outreached** — the patient has received an outreach attempt.
-3. **Engaged** — the patient was successfully reached.
-4. **Committed** — the patient verbally commits to changing PCP information or scheduling with their attributed provider.
-5. **Converted** — the payer file reflects the provider change, or the patient completes an appointment with their attributed provider within 60 days.
-6. **Payer recognized** — the payer confirms the updated attribution.
+## Prototype assumptions
 
-## How it works
+- All names, identifiers, phone numbers, and email addresses are fictional. Do not enter real patient information.
+- Outreach is recorded manually; the app does not send messages or contact patients.
+- Funnel status is derived from the latest outreach outcome. `Appointment completed` advances to Converted; `Payer file updated` advances to Payer Recognized.
+- Conversion and engagement rates are basic prototype calculations based on saved outreach attempts. Clinical and PMPM outcomes are not modeled.
+- No sign-in or role controls are included. The local-only setup is for workflow exploration, not production use.
 
-AtReach compares the THN attribution/utilization model with payer attribution data to surface actionable mismatches. Eligible patients appear in a work queue where authorized users can review context, conduct outreach, and document the result.
+## Code map
 
-During outreach, the team confirms the patient's preferred PCP and can help the patient:
+- `server.py` — local HTTP server, SQLite schema, synthetic sample generation, and JSON endpoints.
+- `web/index.html` — queue, reporting, and patient workspace layout.
+- `web/styles.css` — responsive visual styles.
+- `web/app.js` — filters, patient detail, outreach form, and reporting behavior.
 
-- Schedule with their attributed provider.
-- Change PCP information through the payer's portal or designated process.
-- Reinstate an appropriate in-network relationship when eligible.
+## Future integration direction
 
-Each managed Medicaid organization may have its own PCP-change form or procedure. The workflow should support those plan-specific requirements.
-
-## Users
-
-| User group | Primary use |
-| --- | --- |
-| THN attribution team | Day-to-day patient review, outreach, and outcome documentation. |
-| THN, Quality, VBC, and Finance leaders | Monitor the problem and performance; engage payers strategically. |
-| Population Health teams | Refer eligible patients into the work queue. |
-
-## Key performance indicators
-
-### Process KPIs
-
-- Number of patients not attributed to a THN ACO provider according to the THN Attribution Model.
-- **Conversion rate:** patients with a payer-file provider change or an appointment completed with the attributed provider within 60 days, divided by outreaches.
-- **Leading conversion rate:** patients with a documented verbal commitment to change provider or schedule an appointment, divided by outreaches.
-- **Engagement rate:** patients reached, divided by outreaches.
-
-### Outcome KPIs
-
-- Network PMPM.
-- Network A1C control rate (A1C <7%).
-- Network blood-pressure control rate (definition TBD).
-- Network statin medication adherence.
-
-## Measurement plan
-
-Compare the total ACO population with patients not attributed to a THN ACO provider under the THN Attribution Model. Track:
-
-- PMPM costs
-- A1C control rate (<7%)
-- Blood-pressure control rate (TBD)
-- Prior full-year statin medication adherence
-- Patient count
-
-## V1 scope
-
-V1 must:
-
-- Identify eligible patients.
-- Produce a contactable patient list with the context needed for outreach:
-  - MRN
-  - Name
-  - Date of birth
-  - Preferred communication preference
-  - Phone number
-  - Email address
-- Allow users to record outreach completion, outreach outcome, and verbal provider confirmation.
-
-Bulk/worklist outreach (such as SMS, MyChart, email, or agent phone calls) is a possible future enhancement and is not in V1.
-
-## Access and security
-
-- Access requires a valid, active THN EID.
-- Authentication and authorization will use Microsoft Entra ID and Azure controls.
-- The workflow must protect PHI and comply with HIPAA.
-- Outreach scripts and practices must follow payer, legal, and FCC requirements.
-
-## Dependencies
-
-- THN Attribution Team
-- THN strategic alignment and sponsorship
-- Analytics and HDI, including the THN Attribution Model and payer-data pipeline
-
-## Strategic alignment
-
-**Strategic priority:** Achieve Fiscal Resilience & Smart Growth  
-**Strategic initiative:** Value-based care performance management
-
-AtReach supports operational and clinical levers that affect financial performance in value- and risk-based contracts, including revenue cycle/coding, risk adjustment, risk stratification, and utilization management.
-
-## Future direction
-
-V2 and later phases may add follow-up flags, operational dispositions, bulk outreach capabilities, and additional workflow automation.
+For a later organization-approved version, replace the local sample-data source and SQLite storage with approved ACO data services, plan Azure-based authentication and access controls, and connect to the Databricks environment. The prototype keeps these integrations out of the local workflow.

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AtReach | ACO Workbench</title><link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">A</span><span>AtReach</span></div>
+    <div class="workspace-label">ACO WORKBENCH</div>
+    <nav><button class="nav-item active" data-view="queue"><span>▤</span> Review queue <i id="nav-count">—</i></button><button class="nav-item" data-view="reports"><span>▥</span> Reporting</button></nav>
+    <div class="side-bottom"><div class="demo-tag"><span></span> Local prototype</div><div class="user"><div class="avatar">AU</div><div><b>ACO User</b><small>Attribution team</small></div><span class="more">•••</span></div></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div class="crumb">AtReach <span>/</span> <b id="crumb-title">Review queue</b></div><div class="today" id="today"></div></header>
+    <div class="content">
+      <section id="queue-view">
+        <div class="page-head"><div><div class="kicker">ATTRIBUTION OPERATIONS</div><h1>Patient review queue</h1><p>Review active patients whose payer attribution and ACO utilization point to different providers.</p></div><div class="demo-label">SYNTHETIC SAMPLE DATA</div></div>
+        <div class="metrics" id="queue-metrics"></div>
+        <section class="panel funnel-panel"><div class="panel-head"><div><h2>Conversion funnel</h2><p>Current patient status across the review process</p></div><a href="#" id="view-report">View report <span>↗</span></a></div><div class="funnel" id="funnel"></div></section>
+        <section class="panel queue-panel"><div class="queue-head"><div><h2>Patients for review <span class="subtle" id="result-count"></span></h2><p>Zero-utilization patients are excluded from this queue.</p></div><button class="quiet-button" id="clear-filters">Clear filters <span>↺</span></button></div>
+          <div class="filters"><label class="search"><span>⌕</span><input id="search" placeholder="Search patient, MRN, or payer"></label><select id="status-filter" aria-label="Filter by status"><option value="">All statuses</option></select><select id="payer-filter" aria-label="Filter by payer"><option value="">All payers</option></select><span class="filter-count" id="filter-count"></span></div>
+          <div class="table-wrap"><table><thead><tr><th>Patient</th><th>Attribution mismatch</th><th>Recent ACO utilization</th><th>Payer</th><th>Preferred contact</th><th>Work status</th><th></th></tr></thead><tbody id="patient-rows"></tbody></table><div class="empty" id="empty-state" hidden>No patients match these filters.</div></div>
+          <div class="table-foot"><span id="table-summary"></span><span class="sample-note">Sample records are fictional</span></div>
+        </section>
+      </section>
+      <section id="reports-view" hidden>
+        <div class="page-head"><div><div class="kicker">WORK QUEUE PERFORMANCE</div><h1>Progress and outcomes</h1><p>Operational measures calculated from the synthetic patient list and outreach activity.</p></div><div class="demo-label">SYNTHETIC SAMPLE DATA</div></div>
+        <div class="metrics" id="report-metrics"></div>
+        <div class="report-grid"><section class="panel"><div class="panel-head"><div><h2>Patient funnel</h2><p>Patients currently at each stage</p></div></div><div id="report-funnel" class="report-funnel"></div></section><section class="panel"><div class="panel-head"><div><h2>Activity summary</h2><p>Outreach attempts logged in this prototype</p></div></div><div id="activity-summary"></div></section></div>
+        <div class="note-box"><b>About this report</b><p>Conversion currently means an appointment completed or payer file update recorded. Rates use total outreach attempts as the denominator. Clinical and PMPM comparisons are not included because this prototype contains synthetic data.</p></div>
+      </section>
+    </div>
+  </main>
+  <div class="overlay" id="overlay" hidden><aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-name"><div class="drawer-top"><div><div class="kicker">PATIENT WORKSPACE</div><div class="drawer-title" id="drawer-name"></div><div class="drawer-sub" id="drawer-mrn"></div></div><button class="icon-button" id="close-drawer" aria-label="Close patient workspace">×</button></div><div class="drawer-scroll" id="drawer-body"></div></aside></div>
+  <script src="/app.js" defer></script>
+</body></html>
