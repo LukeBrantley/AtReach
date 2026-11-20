@@ -1,0 +1,12 @@
+import {build} from 'esbuild';
+import {mkdir,readFile,writeFile,copyFile} from 'node:fs/promises';
+await mkdir('.local',{recursive:true});await mkdir('dist/server',{recursive:true});await mkdir('dist/.openai',{recursive:true});
+const out=await build({entryPoints:['src/main.tsx'],bundle:true,minify:true,write:false,format:'iife',target:'es2022',loader:{'.md':'text'},define:{'process.env.NODE_ENV':'"production"'}});
+const js=out.outputFiles.find(f=>f.path.endsWith('.js'))||out.outputFiles[0];
+const css=await readFile('src/styles.css','utf8');
+const html=`<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#155e4d"><title>AtReach · Attribution workspace</title><meta name="description" content="Synthetic-data ACO attribution outreach and follow-up workspace."><style>${css}</style></head><body><div id="root"></div><script>${js.text.replaceAll('</script','<\\/script')}</script></body></html>`;
+await writeFile('.local/page.html',html);
+await build({entryPoints:['server/worker.ts'],bundle:true,minify:true,outfile:'dist/server/index.js',format:'esm',target:'es2022',loader:{'.html':'text'}});
+await build({entryPoints:['server/api.ts'],bundle:true,outfile:'.local/api.mjs',format:'esm',platform:'node',target:'node24'});
+await copyFile('.openai/hosting.json','dist/.openai/hosting.json');
+console.log('Built React UI, SQL-backed API, and deployable Worker.');
